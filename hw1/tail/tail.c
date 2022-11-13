@@ -1,18 +1,10 @@
-#include "../header.h"
 #include "../util/utils.c"
-void read_write(int fd, char *buff, size_t sz){
-        if(-1 == read(fd, buff,sz)){
-            fprintf(stderr,"error while trying to read from file");
-            exit(1);
 
-        }
-        if(-1 == write(1, buff,sz)){
-            fprintf(stderr,"error while tring to write to stdout");
-            exit(1);
-        }
-}
 void print_last(int fd, int *arr){
-	lseek(fd, arr[1]-arr[0], SEEK_SET);
+	if(-1 == lseek(fd, arr[1]-arr[0], SEEK_SET)){
+		fprintf(stderr, "error while using lseek");
+		exit(1);
+	}
 
     int chunks = arr[0]/4;
     int last_chunk = arr[0]%4;
@@ -66,7 +58,7 @@ int main(int argc, char* argv[]){
 		printf("error while trying to open %s\n", argv[1]);
 		exit(1);
 	}
-	int *arr;
+	int *offsets;
 
 	int n =-1;
 	for(int i = 0; i<argc;i++){

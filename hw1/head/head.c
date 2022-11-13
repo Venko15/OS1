@@ -1,20 +1,8 @@
-#include "../header.h"
 #include "../util/utils.c"
-void read_write(int fd, char *buff, size_t sz){
-        if(-1 == read(fd, buff,sz)){
-            fprintf(stderr,"error while trying to read from file");
-            exit(1);
-
-        }
-        if(-1 == write(1, buff,sz)){
-            fprintf(stderr,"error while tring to write to stdout");
-            exit(1);
-        }
-}
 int *lines(int fd, int lines_num){
 	int ix = 0;
 	char *buff = calloc(1, sizeof(char));
-	int *offsets = (int*)calloc(2,sizeof(int));// first index is used to know when we have encountered the line we need
+	int offsets[2];// first index is used to know when we have encountered the line we need
 												//second index is for the size of the file in bytes;
 	int all_lines=0;
 	while(read(fd,buff,1)==1){

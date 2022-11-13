@@ -1,3 +1,5 @@
+#include "../header.h"
+
 int string_eq(char *arg, char *check){
 	int min_sz=0;
 	for(int i = 0; arg[i] != '\0' || check[i] != '\0';i++){
@@ -13,4 +15,15 @@ int string_eq(char *arg, char *check){
 	}
 	return 1;
 
+}
+void read_write(int fd, char *buff, size_t sz){
+        if(-1 == read(fd, buff,sz)){
+            fprintf(stderr,"error while trying to read from file");
+            exit(1);
+
+        }
+        if(-1 == write(1, buff,sz)){
+            fprintf(stderr,"error while tring to write to stdout");
+            exit(1);
+        }
 }
