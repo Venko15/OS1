@@ -28,11 +28,17 @@ void print_last(int fd, int *arr){
 int *lines_backwards(int fd, int line_num){
 	int ix = 0;
 	char *buff = calloc(1, sizeof(char));
-	int *offsets = (int*)calloc(2,sizeof(int));
+	int *offsets = (int*)calloc(2,sizeof(int)); // first index is used to know when we have encountered the line we need
+												//second index is for the size of the file in bytes;
 	int cnt=0;
     int cursor = 0;
     offsets[0]=0;
-	lseek(fd, -1, SEEK_END);
+	if(-1 == lseek(fd, -1, SEEK_END)){
+		fprintf(stderr, "error while using lseek");
+		exit(1);
+
+	}
+
 	while(read(fd,buff,1)==1 && cursor>=0){
 		ix++;
 		//printf("[%s]\n", buff);
@@ -62,21 +68,18 @@ int main(int argc, char* argv[]){
 	}
 	int *arr;
 
-	int flag_n =-1;
+	int n =-1;
 	for(int i = 0; i<argc;i++){
 		if(string_eq(argv[i], "-n")){
-        	flag_n = atoi(argv[i+1]);
+        	n = atoi(argv[i+1]);
 			break;
     	}
 	}
-	if(flag_n < 0){
-		flag_n = 10;
+	if(n < 0){
+		n = 10;
 	}
-	arr = lines_backwards(fd, flag_n);
-	for(int i = 0 ; i<2;i++){
-		printf("%d ", arr[i]);
-	}
-		printf("\n");
-	print_last(fd, arr);
+	offsets = lines_backwards(fd, n);
+
+	print_last(fd, offsets);
     close(fd);
 }

@@ -14,22 +14,22 @@ void read_write(int fd, char *buff, size_t sz){
 int *lines(int fd, int lines_num){
 	int ix = 0;
 	char *buff = calloc(1, sizeof(char));
-	int *offsets = (int*)calloc(2,sizeof(int));
-	int cnt=0;
-	offsets[0]=71;
+	int *offsets = (int*)calloc(2,sizeof(int));// first index is used to know when we have encountered the line we need
+												//second index is for the size of the file in bytes;
+	int all_lines=0;
 	while(read(fd,buff,1)==1){
 		ix++;
 		
 		if(buff[0] == '\n' ){
-			cnt++;
+			all_lines++;
 
-			if(lines_num==cnt ){
+			if(lines_num==all_lines ){
 				offsets[0] = ix;
 				break;
 			}
 		}
 	}
-	if(cnt<lines_num){
+	if(all_lines<lines_num){
 
 		offsets[0] = ix;
 	}
@@ -65,23 +65,18 @@ int main(int argc, char* argv[]){
 		exit(1);
 
 	}
-	int flag_n =-1;
+	int n =-1;
 	for(int i = 0; i<argc;i++){
 		if(string_eq(argv[i], "-n")){
-        	flag_n = atoi(argv[i+1]);
+        	n = atoi(argv[i+1]);
 			break;
     	}
 	}
-	if(flag_n <0){
-		flag_n = 10;
+	if(n <0){
+		n = 10;
 	}
-	int *arr;
-	arr = lines(fd,flag_n);
-
-	for(int i = 0 ; i<2;i++){
-		printf("%d ", arr[i]);
-	}
-		printf("\n");
-	print_first(fd, arr);
+	int *offsets;
+	offsets = lines(fd,n);
+	print_first(fd, offsets);
 
 }
