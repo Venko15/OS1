@@ -28,10 +28,10 @@ void print_last(int fd, int *arr){
 int *lines_backwards(int fd, int line_num){
 	int ix = 0;
 	char *buff = calloc(1, sizeof(char));
-	int *line_arr = (int*)calloc(2,sizeof(int));
+	int *offsets = (int*)calloc(2,sizeof(int));
 	int cnt=0;
     int cursor = 0;
-    line_arr[0]=0;
+    offsets[0]=0;
 	lseek(fd, -1, SEEK_END);
 	while(read(fd,buff,1)==1 && cursor>=0){
 		ix++;
@@ -39,7 +39,7 @@ int *lines_backwards(int fd, int line_num){
 		if(buff[0] == '\n' ){
 			cnt++;
 			if(line_num==cnt-1){
-				line_arr[0] = ix;
+				offsets[0] = ix;
 				
 			}
 		}
@@ -47,11 +47,11 @@ int *lines_backwards(int fd, int line_num){
 		
 	}
     if(cnt<line_num){
-        line_arr[0]=ix;
+        offsets[0]=ix;
     }
-	line_arr[1] = ix;
+	offsets[1] = ix;
 	free(buff);
-	return line_arr;
+	return offsets;
 
 }
 int main(int argc, char* argv[]){

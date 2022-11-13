@@ -14,9 +14,9 @@ void read_write(int fd, char *buff, size_t sz){
 int *lines(int fd, int lines_num){
 	int ix = 0;
 	char *buff = calloc(1, sizeof(char));
-	int *line_arr = (int*)calloc(2,sizeof(int));
+	int *offsets = (int*)calloc(2,sizeof(int));
 	int cnt=0;
-	line_arr[0]=71;
+	offsets[0]=71;
 	while(read(fd,buff,1)==1){
 		ix++;
 		
@@ -24,18 +24,18 @@ int *lines(int fd, int lines_num){
 			cnt++;
 
 			if(lines_num==cnt ){
-				line_arr[0] = ix;
+				offsets[0] = ix;
 				break;
 			}
 		}
 	}
 	if(cnt<lines_num){
 
-		line_arr[0] = ix;
+		offsets[0] = ix;
 	}
-	line_arr[1] = ix;
+	offsets[1] = ix;
 	free(buff);
-	return line_arr;
+	return offsets;
 }
 
 void print_first(int fd, int *arr){

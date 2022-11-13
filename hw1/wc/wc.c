@@ -11,6 +11,7 @@ int lines(int fd){
 	}
 	return lines_num;
 }
+
 int bytes(int fd){
 	int num_bytes = lseek(fd, 0 , SEEK_END);
 	if(-1 == num_bytes){
@@ -34,7 +35,6 @@ int main(int argc, char *argv[]){
 		exit(1);
 
 	}
-	//printf("%d\n",string_eq(argv[1], argv[2]));
 	if(argc == 3){
 		if(string_eq(argv[2], "-l")){
 			flag_l = 1;			
