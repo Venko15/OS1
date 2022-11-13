@@ -1,8 +1,11 @@
 #include "../util/utils.c"
-
+void print_error(char *string){
+	fprintf(stderr,string);
+}
 void print_last(int fd, int *arr){
 	if(-1 == lseek(fd, arr[1]-arr[0], SEEK_SET)){
-		fprintf(stderr, "error while using lseek");
+		print_error("error while using lseek\n");
+		close(fd);
 		exit(1);
 	}
 
@@ -19,24 +22,26 @@ void print_last(int fd, int *arr){
 }
 int *lines_backwards(int fd, int line_num){
 	int ix = 0;
-	char *buff = calloc(1, sizeof(char));
-	int *offsets = (int*)calloc(2,sizeof(int)); // first index is used to know when we have encountered the line we need
+	char buff ;
+	int *offsets = calloc(2,sizeof(int));;// first index is used to know when we have encountered the line we need
 												//second index is for the size of the file in bytes;
-	int cnt=0;
+	int all_lines=0;
     int cursor = 0;
     offsets[0]=0;
-	if(-1 == lseek(fd, -1, SEEK_END)){
-		fprintf(stderr, "error while using lseek");
-		exit(1);
 
+	if(-1 == lseek(fd, -1, SEEK_END)){
+		print_error("error while using lseek\n");
+		close(fd);
+		free(offsets);
+		exit(1);
 	}
 
-	while(read(fd,buff,1)==1 && cursor>=0){
+	while(read(fd,&buff,1)==1 && cursor>=0){
 		ix++;
 		//printf("[%s]\n", buff);
-		if(buff[0] == '\n' ){
-			cnt++;
-			if(line_num==cnt-1){
+		if(buff == '\n' ){
+			all_lines++;
+			if(line_num==all_lines-1){
 				offsets[0] = ix;
 				
 			}
@@ -44,29 +49,37 @@ int *lines_backwards(int fd, int line_num){
         cursor = lseek(fd, -2, SEEK_CUR);
 		
 	}
-    if(cnt<line_num){
+    if(all_lines<line_num){
         offsets[0]=ix;
     }
-	offsets[1] = ix;
-	free(buff);
-	return offsets;
 
+	offsets[1] = ix;
+	return offsets;
 }
 int main(int argc, char* argv[]){
 	int fd = open(argv[1], O_RDONLY);
-    if(-1==fd){
-		printf("error while trying to open %s\n", argv[1]);
+	if(argc <2){
+		print_error("not enough arguments\n");
+		close(fd);
 		exit(1);
 	}
+    if(-1==fd){
+		print_error("error while trying to open file\n");
+		close(fd);
+		exit(1);
+	}
+
 	int *offsets;
 
 	int n =-1;
-	for(int i = 0; i<argc;i++){
+
+	for(int i = 0; i<argc && argc>3;i++){
 		if(string_eq(argv[i], "-n")){
         	n = atoi(argv[i+1]);
 			break;
     	}
 	}
+
 	if(n < 0){
 		n = 10;
 	}
@@ -74,4 +87,5 @@ int main(int argc, char* argv[]){
 
 	print_last(fd, offsets);
     close(fd);
+	free(offsets);
 }

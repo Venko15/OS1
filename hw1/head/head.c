@@ -1,14 +1,14 @@
 #include "../util/utils.c"
 int *lines(int fd, int lines_num){
 	int ix = 0;
-	char *buff = calloc(1, sizeof(char));
-	int offsets[2];// first index is used to know when we have encountered the line we need
+	char buff;
+	int *offsets = calloc(2,sizeof(int));// first index is used to know when we have encountered the line we need
 												//second index is for the size of the file in bytes;
 	int all_lines=0;
-	while(read(fd,buff,1)==1){
+	while(read(fd,&buff,1)==1){
 		ix++;
 		
-		if(buff[0] == '\n' ){
+		if(buff == '\n' ){
 			all_lines++;
 
 			if(lines_num==all_lines ){
@@ -22,13 +22,13 @@ int *lines(int fd, int lines_num){
 		offsets[0] = ix;
 	}
 	offsets[1] = ix;
-	free(buff);
 	return offsets;
 }
 
 void print_first(int fd, int *arr){
 	if(-1 == lseek(fd, 0, SEEK_SET)){
 		fprintf(stderr,"error while using lseek");
+		close(fd);
 		exit(1);
 	}
     int chunks = arr[0]/4;
@@ -44,17 +44,18 @@ void print_first(int fd, int *arr){
 }
 int main(int argc, char* argv[]){
 	if(argc<2){
-		fprintf(stderr,"not enough arguments");
+		fprintf(stderr,"not enough arguments\n");
 		exit(1);
 	}
 	int fd = open(argv[1], O_RDONLY);
 	if(-1==fd){
 		fprintf(stderr,"error while trying to open %s\n", argv[1]);
+		close(fd);
 		exit(1);
 
 	}
 	int n =-1;
-	for(int i = 0; i<argc;i++){
+	for(int i = 0; i<argc && argc>3;i++){
 		if(string_eq(argv[i], "-n")){
         	n = atoi(argv[i+1]);
 			break;
@@ -66,5 +67,5 @@ int main(int argc, char* argv[]){
 	int *offsets;
 	offsets = lines(fd,n);
 	print_first(fd, offsets);
-
+	close(fd);
 }

@@ -2,10 +2,10 @@
 #include "../util/utils.c"
 
 int lines(int fd){
-	char *buff=calloc(1, sizeof(char));
+	char buff;
 	int lines_num = 1;
-	while(read(fd,buff,1)==1){
-		if(buff[0] == '\n'){
+	while(read(fd,&buff,1)==1){
+		if(buff == '\n'){
 			lines_num++;
 		}
 	}
@@ -16,22 +16,28 @@ int bytes(int fd){
 	int num_bytes = lseek(fd, 0 , SEEK_END);
 	if(-1 == num_bytes){
 		fprintf(stderr,"error while using lseek");
+		close(fd);
 		exit(1);
 	}
 	if(-1 == lseek(fd, 0 ,  SEEK_SET)){
-		printf("error while using lseek");
+		printf("error while using lseek");\
+		close(fd);
 		exit(1);
 	}
 	return num_bytes;
-
-
 }
 int main(int argc, char *argv[]){
 	int fd = open(argv[1], O_RDONLY);
 	int flag_l = 0;
 	int flag_c = 0;
+	if(argc <2){
+		fprintf(stderr,"not enough arguments\n");
+		close(fd);
+		exit(1);
+	}
 	if(-1==fd){
-		fprintf(stderr,"error while trying to open %s", argv[1]);
+		fprintf(stderr,"error while trying to open %s\n", argv[1]);
+		close(fd);
 		exit(1);
 
 	}
